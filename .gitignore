@@ -1,0 +1,14 @@
+# Ignore virtual environment directories
+venv
+# Ignore environment variable files
+.env
+# Ignore Python cache directories
+__pycache__/
+# Ignore Python bytecode files
+*.pyc
+# Ignore database files
+*.db
+# Ignore log files
+*.log
+# OS files
+.DS_Store

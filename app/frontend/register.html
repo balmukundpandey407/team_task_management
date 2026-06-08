@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Register</title>
+</head>
+<body>  
+
+<h2>Register</h2>
+
+<input id="firstName" placeholder="First Name">
+<input id="lastName" placeholder="Last Name">
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="register()">Register</button>
+
+<script>
+async function register(){
+    await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        })
+    });
+}
+</script>
+
+</body>
+</html>
