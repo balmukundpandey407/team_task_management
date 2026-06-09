@@ -15,38 +15,171 @@
     <title>Dashboard - Team Task Management</title>
 </head>
 <body>
-    <h1>Dashboard</h1>
-    <p>Welcome to your dashboard!</p>
+    <div class="dashboard-shell">
+        <header>
+            <div class="brand">
+                <span class="mark">TT</span>
+                <div>
+                    <strong>Team Task Management</strong>
+                    <p>Manage your teams, tasks, and admin views from one place.</p>
+                </div>
+            </div>
+            <button class="logout" onclick="logout()">Logout</button>
+        </header>
 
-    <button onclick="logout()">
-    Logout
-</button>
+        <main>
+            <section class="card action-card">
+                <div class="intro-block">
+                    <h1>Welcome to your dashboard</h1>
+                    <p>Use the quick actions below to create teams, assign tasks, and review activity.</p>
+                </div>
+
+                <div class="actions-group">
+                    <div>
+                        <h2>Teams</h2>
+                        <div class="button-grid">
+                            <button onclick="createTeam()">Create Team</button>
+                            <button onclick="listTeams()">List Teams</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2>Tasks</h2>
+                        <div class="button-grid">
+                            <button onclick="createTask()">Create Task</button>
+                            <button onclick="viewTasks()">View Tasks</button>
+                            <button onclick="updateTask('task_id')">Update Task</button>
+                            <button onclick="deleteTask('task_id')">Delete Task</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2>Admin</h2>
+                        <div class="button-grid">
+                            <button class="secondary" onclick="viewUsers()">View Users</button>
+                            <button class="secondary" onclick="viewAllTasks()">View All Tasks</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card output-card">
+                <div class="output-header">
+                    <h2>Activity log</h2>
+                    <p>Responses from your API requests will appear here.</p>
+                </div>
+                <div id="log" class="log-list">
+                    <div class="log-entry">
+                        <strong>Ready</strong>
+                        <span>Use a button to send a request and inspect the response here.</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
 <script>
+
 function logout() {
     localStorage.removeItem("token");
     window.location.href = "login.html";
 }
+
+async function createTeam() {
+    await fetch("http://localhost:8000/teams", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            name: "New Team"
+        })
+
+    });
+}
+
+async function listTeams() {
+    await fetch("http://localhost:8000/teams", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+async function createTask() {
+    await fetch("http://localhost:8000/tasks", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            title: "New Task",
+            description: "Task description",
+            assigned_to: "user_id",
+            team_id: "team_id"
+        })
+    });
+}
+
+async function viewTasks() {
+    await fetch("http://localhost:8000/tasks", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+async function updateTask(id) {
+    await fetch(`http://localhost:8000/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            title: "Updated Task",
+            description: "Updated task description",
+            status: "Updated Status"
+        })
+    });
+}
+
+async function deleteTask(id) {
+    await fetch(`http://localhost:8000/tasks/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+async function viewUsers() {
+    await fetch("http://localhost:8000/admin/users", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+async function viewAllTasks() {
+    await fetch("http://localhost:8000/admin/tasks", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
 </script>
-    
+
 </body>
 </html>
-
-<!-- Create Team
-List Teams -->
-
-POST /tasks
-GET /tasks
-PUT /tasks/{id}
-DELETE /tasks/{id}
-
-Create Task
-View Tasks
-Update Status
-Delete Task
-
-GET /admin/users
-GET /admin/tasks
-
-Users
-All Tasks

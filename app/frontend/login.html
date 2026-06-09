@@ -8,38 +8,49 @@
 </head>
 <body>
 
-<h2>Login</h2>
+<div class="auth-shell">
+    <span class="mark">TT</span>
+     <strong>Team Task Management</strong>
+    <h2>Welcome back</h2>
+    <p>Sign in to access your team dashboard and manage tasks.</p>
+    <div class="auth-actions">
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
 
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
+        <p class="auth-footer">Don’t have an account? <a href="register.html">Create one</a>.</p>
+    </div>
+</div>
 
 <script>
-async function login(){
-    await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value
-        })
-    });
+async function login() {
+    try {
+        const response = await fetch("http://localhost:8000/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        });
+
+        if (!response.ok) {
+            console.error("Login failed");
+            return;
+        }
+
+        const data = await response.json();
+
+        localStorage.setItem("token", data.token);
+
+        window.location.href = "dashboard.html";
+
+    } catch (err) {
+        console.error("Error:", err);
+    }
 }
-
-
-    const data = await response.json();
-
-    localStorage.setItem(
-        "token",
-        data.access_token
-    );
-
-    window.location.href = "dashboard.html";
-
-
 </script>
 
 </body>
