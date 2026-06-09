@@ -12,7 +12,7 @@ admin_router = APIRouter()
 def get_all_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 
     # Check if the current user is an admin
-    if not current_user.is_admin:
+    if not current_user.role == "admin":
         raise HTTPException(status_code=403, detail="You do not have permission to access this resource")
 
     users = db.query(User).all()
@@ -22,7 +22,7 @@ def get_all_users(db: Session = Depends(get_db), current_user: User = Depends(ge
 def get_all_tasks(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 
     # Check if the current user is an admin
-    if not current_user.is_admin:
+    if not current_user.role == "admin":
         raise HTTPException(status_code=403, detail="You do not have permission to access this resource")
 
     tasks = db.query(Task).all()

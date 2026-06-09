@@ -11,6 +11,11 @@ team_router = APIRouter()
 
 @team_router.post("/teams")
 def create_team(team_data: TeamCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user.role == "admin":
+        raise HTTPException(status_code=403, detail="You do not have permission to access this resource")
+    if db.query(Team).filter(Team.name == team_data.name).first():
+        raise HTTPException(status_code=400, detail="Team name already exists")
+
 
     new_team = Team(
         id=str(uuid.uuid4()),

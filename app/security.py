@@ -6,9 +6,9 @@ import os
 
 security = HTTPBearer()
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
-token_expiry_time = os.getenv("TOKEN_EXPIRY_TIME")
+JWT_SECRET_KEY = os.getenv("SECRET_KEY")
+JWT_ALGORITHM = os.getenv("ALGORITHM")
+token_expiry_time = int(os.getenv("TOKEN_EXPIRY_TIME"))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     
@@ -32,6 +32,8 @@ def decode_jwt(token: str):
         decoded_token = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         return decoded_token if decoded_token["exp"] >= time.time() else None
     except jwt.ExpiredSignatureError:
+        print("Token has expired")  # Debugging statement
         return None
     except jwt.InvalidTokenError:
+        print("Invalid token")  # Debugging statement
         return None

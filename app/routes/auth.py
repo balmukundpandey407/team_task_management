@@ -36,10 +36,11 @@ def get_current_user(
             detail="User not found"
         )
 
-    return Userout(
+    return User(
         id=user.id,
         first_name=user.first_name,
         last_name=user.last_name,
+        role=user.role,
         email=user.email
     )
 
@@ -59,6 +60,7 @@ def sign_up_user(sign_up_data: UserCreate, db: Session = Depends(get_db)):
      id= str(uuid.uuid4()),
      first_name=sign_up_data.first_name,
      last_name=sign_up_data.last_name,
+     role="member",
      email=sign_up_data.email,
      password=hashed_password
     )

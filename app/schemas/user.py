@@ -12,11 +12,13 @@ class Userout(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    role: str
 
 class Userupdate(BaseModel):
     id: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    role: Optional[str] = None
     email: Union[EmailStr, None] = None
     password: Optional[str] = Field(default=None, min_length=6)
 
