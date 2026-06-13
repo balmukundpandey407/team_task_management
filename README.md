@@ -1,4 +1,4 @@
-# Team Task Management API
+# Team Task Management System
 
 A backend application built with FastAPI and PostgreSQL for managing teams and tasks. The system supports user authentication, role-based access control, team creation, task assignment, and task management.
 
@@ -12,6 +12,7 @@ A backend application built with FastAPI and PostgreSQL for managing teams and t
 * Assign Tasks to Users
 * PostgreSQL Database Integration
 * FastAPI Interactive Documentation
+* Simple Dashboard UI
 
 ## Tech Stack
 
@@ -96,21 +97,39 @@ http://localhost:8000/docs
 
 ```text
 app/
+├──frontend/
 ├── models/
 ├── routes/
 ├── schemas/
 ├── database.py
 ├── security.py
 └── main.py
+
+frontend/ 
+├── login.html 
+├── register.html 
+├── dashboard.html 
+├── style.css
 ```
+
+```md
+## Screenshots
+
+### Login
+![Login](screenshots/login.png)
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### API Documentation
+![Swagger Docs](screenshots/swagger.png)
 
 ## Future Improvements
 
-* Team member management
+* Team member management UI
 * Task filtering and search
 * Email notifications
-* Activity logs
-* Frontend integration
+* Activity Tracking
+
 
 ## Author
    BALMUKUND PANDEY
