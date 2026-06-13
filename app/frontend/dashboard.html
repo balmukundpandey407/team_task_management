@@ -24,7 +24,9 @@
                     <p>Manage your teams, tasks, and admin views from one place.</p>
                 </div>
             </div>
-            <button class="logout" onclick="logout()">Logout</button>
+
+            <div
+            <button class="logout" onclick="logout()"></button>Logout</button>
         </header>
 
         <main>
@@ -38,21 +40,21 @@
                     <div>
                         <h2>Teams</h2>
                         <div class="button-grid">
-                            <button onclick="createTeam()">Create Team</button>
+                            <button onclick="showTeamForm()">Create Team</button>
                             <button onclick="listTeams()">List Teams</button>
                         </div>
                     </div>
-
+                    <div id="form-area1" class="form-area"></div>
                     <div>
                         <h2>Tasks</h2>
                         <div class="button-grid">
-                            <button onclick="createTask()">Create Task</button>
+                            <button onclick="showCreateTaskForm()">Create Task</button>
                             <button onclick="viewTasks()">View Tasks</button>
-                            <button onclick="updateTask('task_id')">Update Task</button>
-                            <button onclick="deleteTask('task_id')">Delete Task</button>
+                            <button onclick="showUpdateTaskForm()">Update Task</button>
+                            <button onclick="showDeleteTaskForm()">Delete Task</button>
                         </div>
                     </div>
-
+                    <div id="form-area2" class="form-area"></div>
                     <div>
                         <h2>Admin</h2>
                         <div class="button-grid">
@@ -61,6 +63,7 @@
                         </div>
                     </div>
                 </div>
+              
             </section>
 
             <section class="card output-card">
@@ -76,109 +79,246 @@
                 </div>
             </section>
         </main>
+        <div id="toast" class="toast"></div>
     </div>
 
 <script>
+    const apiUrl = "http://localhost:8000";
 
-function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
-}
+    function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+    }
 
-async function createTeam() {
-    await fetch("http://localhost:8000/teams", {
-        method: "POST",
-        headers: {
+    function showForm1(html) {
+        document.getElementById("form-area1").innerHTML = html;
+    }
+    function showForm2(html) {
+        document.getElementById("form-area2").innerHTML = html;
+    }
+
+    function closeForm() {
+        showForm1("");
+        showForm2("");
+    }
+
+    function showTeamForm() {
+        showForm1(`
+            <div class="action-form">
+                <h3>Create Team</h3>
+                <div class="form-grid">
+                    <input id="team-name" placeholder="Team Name">
+                    <button onclick="submitTeam()">Submit Team</button>
+                </div>
+            </div>
+        `);
+    }
+
+    function showCreateTaskForm() {
+        showForm2(`
+            <div class="action-form">
+                <h3>Create Task</h3>
+                <div class="form-grid">
+                    <input id="task-title" placeholder="Task Title">
+                    <input id="task-desc" placeholder="Task Description">
+                    <input id="task-assigned" placeholder="Assigned User ID">
+                    <input id="task-team" placeholder="Team ID">
+                    <button onclick="submitTask()">Submit Task</button>
+                </div>
+            </div>
+        `);
+    }
+
+    function showUpdateTaskForm() {
+        showForm2(`
+            <div class="action-form">
+                <h3>Update Task</h3>
+                <div class="form-grid">
+                    <input id="task-update-id" placeholder="Task ID">
+                    <input id="task-update-title" placeholder="New Title">
+                    <input id="task-update-desc" placeholder="New Description">
+                    <input id="task-update-status" placeholder="New Status">
+                    <button onclick="submitTaskUpdate()">Update Task</button>
+                </div>
+            </div>
+        `);
+    }
+
+    function showDeleteTaskForm() {
+        showForm2(`
+            <div class="action-form">
+                <h3>Delete Task</h3>
+                <div class="form-grid">
+                    <input id="task-delete-id" placeholder="Task ID">
+                    <button onclick="submitTaskDelete()">Delete Task</button>
+                </div>
+            </div>
+        `);
+    }
+
+    async function fetchRequest(path, options = {}) {
+        options.headers = {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            name: "New Team"
-        })
+            "Authorization": `Bearer ${token}`,
+            ...(options.headers || {})
+        };
 
-    });
-}
+        try {
+            const response = await fetch(`${apiUrl}${path}`, options);
+            const text = await response.text();
+            let body = text;
+            try {
+                body = JSON.parse(text);
+            } catch (e) {
+                // Leave raw text if parsing fails.
+            }
 
-async function listTeams() {
-    await fetch("http://localhost:8000/teams", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            logAction(`${options.method || "GET"} ${path}`, response.status, body);
+            return { ok: response.ok, status: response.status, body };
+        } catch (error) {
+            logAction(`${options.method || "GET"} ${path}`, "Error", error.message);
+            return { ok: false, status: "Error", body: error.message };
         }
-    });
-}
+    }
 
-async function createTask() {
-    await fetch("http://localhost:8000/tasks", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            title: "New Task",
-            description: "Task description",
-            assigned_to: "user_id",
-            team_id: "team_id"
-        })
-    });
-}
+    function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast-message ${type}`;
+        toast.textContent = message;
+        document.getElementById("toast").appendChild(toast);
+        setTimeout(() => toast.remove(), 4200);
+    }
 
-async function viewTasks() {
-    await fetch("http://localhost:8000/tasks", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+    function logAction(label, status, body) {
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.innerHTML = `
+            <strong>${label}</strong>
+            <span>Status: ${status}</span>
+            <pre>${typeof body === "string" ? body : JSON.stringify(body, null, 2)}</pre>
+        `;
+        document.getElementById("log").prepend(entry);
+    }
+
+    async function submitTeam() {
+        const name = document.getElementById("team-name").value.trim();
+        if (!name) {
+            return showToast("Please enter a team name.", "error");
         }
-    });
-}
 
-async function updateTask(id) {
-    await fetch(`http://localhost:8000/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            title: "Updated Task",
-            description: "Updated task description",
-            status: "Updated Status"
-        })
-    });
-}
+        const response = await fetchRequest("/teams", {
+            method: "POST",
+            body: JSON.stringify({ name })
+        });
 
-async function deleteTask(id) {
-    await fetch(`http://localhost:8000/tasks/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+        if (response.ok) {
+            showToast(`Team created successfully: ${name}`);
+            showForm1("");
+        } else {
+            showToast(response.body?.detail || "Could not create team.", "error");
         }
-    });
-}
+    }
 
-async function viewUsers() {
-    await fetch("http://localhost:8000/admin/users", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    });
-}
+    async function submitTask() {
+        const title = document.getElementById("task-title").value.trim();
+        const description = document.getElementById("task-desc").value.trim();
+        const assigned_to = document.getElementById("task-assigned").value.trim();
+        const team_id = document.getElementById("task-team").value.trim();
 
-async function viewAllTasks() {
-    await fetch("http://localhost:8000/admin/tasks", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+        if (!title || !description || !assigned_to || !team_id) {
+            return showToast("Please fill in every task field.", "error");
         }
-    });
-}
+
+        const response = await fetchRequest("/tasks", {
+            method: "POST",
+            body: JSON.stringify({ title, description, assigned_to, team_id })
+        });
+
+        if (response.ok) {
+            showToast(`Task created successfully: ${title}`);
+            showForm2("");
+        } else {
+            showToast(response.body?.detail || "Could not create task.", "error");
+        }
+    }
+
+    async function submitTaskUpdate() {
+        const id = document.getElementById("task-update-id").value.trim();
+        const title = document.getElementById("task-update-title").value.trim();
+        const description = document.getElementById("task-update-desc").value.trim();
+        const status = document.getElementById("task-update-status").value.trim();
+
+        if (!id) {
+            return showToast("Please enter a task ID.", "error");
+        }
+
+        const payload = {};
+        if (title) payload.title = title;
+        if (description) payload.description = description;
+        if (status) payload.status = status;
+
+        if (!Object.keys(payload).length) {
+            return showToast("Please enter at least one field to update.", "error");
+        }
+
+        const response = await fetchRequest(`/tasks/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            showToast(`Task updated successfully with Task ID: ${id}`);
+            showForm2("");
+        } else {
+            showToast(response.body?.detail || "Could not update task.", "error");
+        }
+    }
+
+    async function submitTaskDelete() {
+        const id = document.getElementById("task-delete-id").value.trim();
+        if (!id) {
+            return showToast("Please enter a task ID.", "error");
+        }
+
+        const response = await fetchRequest(`/tasks/${id}`, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            showToast(`Task deleted successfully: ${id}`);
+            showForm2("");
+        } else {
+            showToast(response.body?.detail || "Could not delete task.", "error");
+        }
+    }
+
+    async function listTeams() {
+        const response = await fetchRequest("/teams", { method: "GET" });
+        if (!response.ok) {
+            showToast(response.body?.detail || "Could not fetch teams.", "error");
+        }
+    }
+
+    async function viewTasks() {
+        const response = await fetchRequest("/tasks", { method: "GET" });
+        if (!response.ok) {
+            showToast(response.body?.detail || "Could not fetch tasks.", "error");
+        }
+    }
+
+    async function viewUsers() {
+        const response = await fetchRequest("/admin/users", { method: "GET" });
+        if (!response.ok) {
+            showToast(response.body?.detail || "Could not fetch users.", "error");
+        }
+    }
+
+    async function viewAllTasks() {
+        const response = await fetchRequest("/admin/tasks", { method: "GET" });
+        if (!response.ok) {
+            showToast(response.body?.detail || "Could not fetch admin tasks.", "error");
+        }
+    }
 </script>
 
 </body>
