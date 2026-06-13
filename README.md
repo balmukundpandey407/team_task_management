@@ -122,6 +122,7 @@ frontend/
 
 ### API Documentation
 ![Swagger Docs](screenshots/swagger.png)
+```
 
 ## Future Improvements
 
