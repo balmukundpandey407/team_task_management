@@ -112,7 +112,6 @@ frontend/
 ├── style.css
 ```
 
-```md
 ## Screenshots
 
 ### Login
@@ -122,7 +121,6 @@ frontend/
 
 ### API Documentation
 ![Swagger Docs](screenshots/swagger.png)
-```
 
 ## Future Improvements
 
