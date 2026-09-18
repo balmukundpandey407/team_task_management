@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/frontend/style.css">
     <title>Register</title>
 </head>
 <body>  
@@ -20,20 +20,20 @@
         <input id="password" type="password" placeholder="Password">
         <button onclick="register()">Register</button>
 
-        <p class="auth-footer">Already have an account? <a href="login.html">Login</a>.</p>
+        <p class="auth-footer">Already have an account? <a href="/login">Login</a>.</p>
     </div>
 </div>
 
 <script>
 async function register(){
-    await fetch("http://localhost:8000/register", {
+    await fetch("/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            firstName: document.getElementById("firstName").value,
-            lastName: document.getElementById("lastName").value,
+            first_name: document.getElementById("firstName").value,
+            last_name: document.getElementById("lastName").value,
             email: document.getElementById("email").value,
             password: document.getElementById("password").value
         })

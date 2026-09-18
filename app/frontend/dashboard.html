@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/frontend/style.css">
     <script>
         const token = localStorage.getItem("token");
 
         if (!token) {
-            window.location.href = "login.html";
+            window.location.href = "/login";
         }
     </script>
 
@@ -81,11 +81,11 @@
     </div>
 
 <script>
-    const apiUrl = "http://localhost:8000";
+    const apiUrl = "";
 
     function logout() {
         localStorage.removeItem("token");
-        window.location.href = "login.html";
+        window.location.href = "/login";
     }
 
     function showForm1(html) {

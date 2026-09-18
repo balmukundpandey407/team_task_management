@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/frontend/style.css">
     <title>Login</title>
 </head>
 <body>
@@ -18,14 +18,14 @@
         <input id="password" type="password" placeholder="Password">
         <button onclick="login()">Login</button>
 
-        <p class="auth-footer">Don’t have an account? <a href="register.html">Create one</a>.</p>
+        <p class="auth-footer">Don't have an account? <a href="/register">Create one</a>.</p>
     </div>
 </div>
 
 <script>
 async function login() {
     try {
-        const response = await fetch("http://localhost:8000/login", {
+        const response = await fetch("/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -45,7 +45,7 @@ async function login() {
 
         localStorage.setItem("token", data.token);
 
-        window.location.href = "dashboard.html";
+        window.location.href = "/frontend/dashboard.html";
 
     } catch (err) {
         console.error("Error:", err);

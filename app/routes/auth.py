@@ -1,15 +1,37 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
+from pathlib import Path
+from sqlalchemy.orm import Session
+import uuid
+
 from app.schemas.user import UserCreate, Userout, UserLogin, UserToken
 from app.models.user import User, Base
 from app.database import get_db, engine
-from sqlalchemy.orm import Session
-import uuid
 from app.security import security, verify_password, hash_password, sign_jwt, decode_jwt
 
 auth_router = APIRouter()
+FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend"
 
 # Create all tables in the database
 Base.metadata.create_all(bind=engine)
+
+
+@auth_router.get("/login", include_in_schema=False)
+def login_page():
+    return FileResponse(FRONTEND_DIR / "login.html")
+
+
+@auth_router.get("/register", include_in_schema=False)
+def register_page():
+    return FileResponse(FRONTEND_DIR / "register.html")
+
+
+@auth_router.get("/frontend/{file_path:path}", include_in_schema=False)
+def frontend_file(file_path: str):
+    requested_file = (FRONTEND_DIR / file_path).resolve()
+    if not requested_file.is_relative_to(FRONTEND_DIR) or not requested_file.is_file():
+        raise HTTPException(status_code=404, detail="Frontend file not found")
+    return FileResponse(requested_file)
 
 
 def get_current_user(
