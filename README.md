@@ -1,6 +1,9 @@
 # Team Task Management System
 
-A backend application built with FastAPI and PostgreSQL for managing teams and tasks. The system supports user authentication, role-based access control, team creation, task assignment, and task management.
+A fully deployed backend application built with FastAPI and PostgreSQL for managing teams and tasks. The system supports user authentication, role-based access control, team creation, task assignment, and task management.
+
+## Live link
+* https://team-task-management-0agp.onrender.com/register
 
 ## Features
 
