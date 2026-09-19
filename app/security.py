@@ -6,8 +6,8 @@ import os
 
 security = HTTPBearer()
 
-JWT_SECRET_KEY = os.getenv("SECRET_KEY")
-JWT_ALGORITHM = os.getenv("ALGORITHM")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM") or os.getenv("ALGORITHM")
 token_expiry_time = int(os.getenv("TOKEN_EXPIRY_TIME"))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

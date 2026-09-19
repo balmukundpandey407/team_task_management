@@ -18,7 +18,8 @@
         <input id="lastName" placeholder="Last Name">
         <input id="email" placeholder="Email">
         <input id="password" type="password" placeholder="Password">
-        <button onclick="register()">Register</button>
+        <button id="register-button" onclick="register()">Register</button>
+        <p id="register-status" aria-live="polite"></p>
 
         <p class="auth-footer">Already have an account? <a href="/login">Login</a>.</p>
     </div>
@@ -26,18 +27,39 @@
 
 <script>
 async function register(){
-    await fetch("/register", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            first_name: document.getElementById("firstName").value,
-            last_name: document.getElementById("lastName").value,
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value
-        })
-    });
+    const button = document.getElementById("register-button");
+    const status = document.getElementById("register-status");
+    button.disabled = true;
+    button.textContent = "Creating account...";
+    status.textContent = "";
+
+    try {
+        const response = await fetch("/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                first_name: document.getElementById("firstName").value,
+                last_name: document.getElementById("lastName").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            status.textContent = error.detail || "Registration failed. Please try again.";
+            return;
+        }
+
+        window.location.href = "/login";
+    } catch (error) {
+        status.textContent = "Unable to connect to the server. Please try again.";
+    } finally {
+        button.disabled = false;
+        button.textContent = "Register";
+    }
 }
 </script>
 

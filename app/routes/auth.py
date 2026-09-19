@@ -25,6 +25,10 @@ def login_page():
 def register_page():
     return FileResponse(FRONTEND_DIR / "register.html")
 
+@auth_router.get("/dashboard", include_in_schema=False)
+def dashboard_page():
+    return FileResponse(FRONTEND_DIR / "dashboard.html")
+
 
 @auth_router.get("/frontend/{file_path:path}", include_in_schema=False)
 def frontend_file(file_path: str):
