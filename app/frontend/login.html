@@ -21,8 +21,17 @@
         <p class="auth-footer">Don't have an account? <a href="/register">Create one</a>.</p>
     </div>
 </div>
+<div id="toast" class="toast"></div>
 
 <script>
+function showToast(message, type = "error") {
+    const toast = document.createElement("div");
+    toast.className = `toast-message ${type}`;
+    toast.textContent = message;
+    document.getElementById("toast").appendChild(toast);
+    setTimeout(() => toast.remove(), 4200);
+}
+
 async function login() {
     try {
         const response = await fetch("/login", {
@@ -35,20 +44,19 @@ async function login() {
                 password: document.getElementById("password").value
             })
         });
+        const data = await response.json();
 
         if (!response.ok) {
-            console.error("Login failed");
+            showToast(data.detail || "Login failed. Please try again.");
             return;
         }
-
-        const data = await response.json();
 
         localStorage.setItem("token", data.token);
 
         window.location.href = "/dashboard";
 
-    } catch (err) {
-        console.error("Error:", err);
+    } catch (error) {
+        showToast("Unable to connect. Please try again.");
     }
 }
 </script>

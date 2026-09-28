@@ -19,19 +19,25 @@
         <input id="email" placeholder="Email">
         <input id="password" type="password" placeholder="Password">
         <button id="register-button" onclick="register()">Register</button>
-        <p id="register-status" aria-live="polite"></p>
 
         <p class="auth-footer">Already have an account? <a href="/login">Login</a>.</p>
     </div>
 </div>
+<div id="toast" class="toast" aria-live="polite"></div>
 
 <script>
+function showToast(message, type = "error") {
+    const toast = document.createElement("div");
+    toast.className = `toast-message ${type}`;
+    toast.textContent = message;
+    document.getElementById("toast").appendChild(toast);
+    setTimeout(() => toast.remove(), 4200);
+}
+
 async function register(){
     const button = document.getElementById("register-button");
-    const status = document.getElementById("register-status");
     button.disabled = true;
     button.textContent = "Creating account...";
-    status.textContent = "";
 
     try {
         const response = await fetch("/register", {
@@ -49,13 +55,13 @@ async function register(){
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            status.textContent = error.detail || "Registration failed. Please try again.";
+            showToast(error.detail || "Registration failed. Please try again.");
             return;
         }
 
         window.location.href = "/login";
     } catch (error) {
-        status.textContent = "Unable to connect to the server. Please try again.";
+        showToast("Unable to connect to the server. Please try again.");
     } finally {
         button.disabled = false;
         button.textContent = "Register";
